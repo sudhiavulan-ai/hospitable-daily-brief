@@ -1,0 +1,38 @@
+name: Hospitable Daily Brief
+
+on:
+  schedule:
+    - cron: '0 12 * * *'   # 7 AM CDT (summer)
+    - cron: '0 13 * * *'   # 7 AM CST (winter)
+  workflow_dispatch:
+    inputs:
+      force_send:
+        description: 'Send even if outside the 7am window (testing)'
+        required: false
+        default: 'true'
+        type: choice
+        options: ['true', 'false']
+
+jobs:
+  send-brief:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run brief
+        env:
+          HOSPITABLE_TOKEN: ${{ secrets.HOSPITABLE_TOKEN }}
+          RESEND_API_KEY:   ${{ secrets.RESEND_API_KEY }}
+          EMAIL_TO:         ${{ vars.EMAIL_TO || 'avulastays@gmail.com' }}
+          EMAIL_FROM:       ${{ vars.EMAIL_FROM || 'onboarding@resend.dev' }}
+          SEND_WINDOW_HOUR: ${{ vars.SEND_WINDOW_HOUR || '7' }}
+          SEND_TIMEZONE:    ${{ vars.SEND_TIMEZONE || 'America/Chicago' }}
+          FORCE_SEND: ${{ github.event_name == 'workflow_dispatch' && inputs.force_send == 'true' && '1' || '' }}
+        run: python daily_brief.py
