@@ -2,8 +2,8 @@ name: Hospitable Daily Brief
 
 on:
   schedule:
-    - cron: '0 12 * * *'   # 7 AM CDT (summer)
-    - cron: '0 13 * * *'   # 7 AM CST (winter)
+    - cron: '0 13 * * *'   # 7 AM CDT (summer)
+    - cron: '0 14 * * *'   # 7 AM CST (winter)
   workflow_dispatch:
     inputs:
       force_send:
@@ -32,7 +32,7 @@ jobs:
           RESEND_API_KEY:   ${{ secrets.RESEND_API_KEY }}
           EMAIL_TO:         ${{ vars.EMAIL_TO || 'avulastays@gmail.com' }}
           EMAIL_FROM:       ${{ vars.EMAIL_FROM || 'onboarding@resend.dev' }}
-          SEND_WINDOW_HOUR: ${{ vars.SEND_WINDOW_HOUR || '7' }}
+          SEND_WINDOW_HOUR: ${{ vars.SEND_WINDOW_HOUR || '8' }}
           SEND_TIMEZONE:    ${{ vars.SEND_TIMEZONE || 'America/Chicago' }}
           FORCE_SEND: ${{ github.event_name == 'workflow_dispatch' && inputs.force_send == 'true' && '1' || '' }}
         run: python daily_brief.py
